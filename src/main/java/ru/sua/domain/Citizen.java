@@ -13,7 +13,7 @@ import java.util.Date;
 public class Citizen {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Basic
