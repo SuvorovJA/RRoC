@@ -1,15 +1,18 @@
 package ru.sua.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Citizen {
 
     @Id
@@ -30,7 +33,7 @@ public class Citizen {
 
     @Size(min = 6, max = 12)
     @Column(unique = true)
-    @Pattern(regexp = "^[0-9]$+")
+    @Pattern(regexp = "^[0-9]+$")
     private String dulnumber;
 
 

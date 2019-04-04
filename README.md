@@ -1,9 +1,9 @@
 ### учебный проект
 RRoC: RESTfull register of citizens (rest-сервер, позволяющий вести реестр жителей)
 
-Стек техногий
+Стек технологий
 - JDK ~1.8~ 1.11
-- Spring Boot (последней версии)
+- Spring Boot (последней версии (2.1.3))
 - Data JPA + Repository
 - WebMVC
 - Security

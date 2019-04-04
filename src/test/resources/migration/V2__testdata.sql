@@ -1,0 +1,10 @@
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (1, 'Флетчер-Крёйгер', '1869 Di Loreto Center', '1970-11-12', '8274773873');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (2, 'Jenee-Crooks', '19 Sachtjen Drive', '1987-04-10', '22173309533');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (3, 'Pete-Hagenes', '4440 Laurel Lane', '1973-06-16', '371474');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (4, 'King-Cruickshank', '968 Towne Parkway', '1990-02-17', '121436496169');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (5, 'Mickey-Treutel', '90 Bunker Hill Terrace', '1996-03-19', '205343909704');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (6, 'Elizabet-Lakin', '035 Bonner Crossing', '1994-01-10', '5615665');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (7, 'Les-Bernier', '348 Warner Center', '1981-08-29', '738678');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (8, 'Fritz-Glover', '396 Randy Parkway', '1996-05-08', '1253196');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (9, 'Pedro-Schulist', '75973 Ramsey Road', '1988-07-14', '4740981');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (10, 'Brooks-Barton', '8421 Pine View Parkway', '1971-03-14', '7316953795');
