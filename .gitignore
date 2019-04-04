@@ -1,0 +1,25 @@
+### Java ###
+*.jar
+*.war
+*.ear
+*.class
+
+### Apache Maven ###
+target/
+
+### Gradle ###
+.gradle/
+!gradle-wrapper.jar
+build/
+
+### JetBrains IntelliJ IDEA ###
+.idea/
+out/
+*.iml
+*ipr
+*.iws
+
+### Application ###
+*.log
+*.gz
+*.tmp
