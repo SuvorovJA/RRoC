@@ -39,7 +39,7 @@ public class CitizenRepositoryTest {
         Optional<Citizen> optional = repository.findById(1L);
         assertTrue(optional.isPresent());
         Citizen citizen = optional.get();
-        assertEquals("Флетчер-Крёйгер", citizen.getFullName());
+        assertEquals("Флетчер-Крёигер", citizen.getFullName());
     }
 
     @Test
@@ -57,6 +57,7 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
+        System.out.println(citizen);
         repository.save(citizen);
         Citizen readedCitizen = repository.findByFullName(stringCorrectFullnameChars);
         assertNotNull(readedCitizen);

@@ -1,4 +1,4 @@
-insert into CITIZEN (id, full_name, address, dob, dulnumber) values (1, 'Флетчер-Крёйгер', '1869 Di Loreto Center', '1970-11-12', '8274773873');
+insert into CITIZEN (id, full_name, address, dob, dulnumber) values (1, 'Флетчер-Крёигер', '1869 Di Loreto Center', '1970-11-12', '8274773873');
 insert into CITIZEN (id, full_name, address, dob, dulnumber) values (2, 'Jenee-Crooks', '19 Sachtjen Drive', '1987-04-10', '22173309533');
 insert into CITIZEN (id, full_name, address, dob, dulnumber) values (3, 'Pete-Hagenes', '4440 Laurel Lane', '1973-06-16', '371474');
 insert into CITIZEN (id, full_name, address, dob, dulnumber) values (4, 'King-Cruickshank', '968 Towne Parkway', '1990-02-17', '121436496169');
