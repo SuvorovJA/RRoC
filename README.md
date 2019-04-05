@@ -1,5 +1,5 @@
 ### учебный проект
-RRoC: RESTfull register of citizens (rest-сервер, позволяющий вести реестр жителей)
+RRoC: RESTful register of citizens (rest-сервер, позволяющий вести реестр жителей)
 
 Стек технологий
 - JDK ~1.8~ 1.11

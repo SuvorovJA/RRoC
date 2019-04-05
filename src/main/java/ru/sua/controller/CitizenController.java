@@ -60,7 +60,7 @@ public class CitizenController {
         return repository.findAll(pageable);
     }
 
-    @GetMapping("/citizens") // TODO not in TZ - for removing
+    @GetMapping("/citizens") // TODO не по ТЗ. убрать?
     public List<Citizen> findAll() {
         return repository.findAll();
     }
