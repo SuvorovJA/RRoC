@@ -9,7 +9,6 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // TODO хм. чегото надо сделать с сотоянием базы
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CitizenControllerTest {
 
@@ -48,14 +46,6 @@ public class CitizenControllerTest {
         ethalonId5Modified = mapper.readValue(ethalonId5ModifiedJson, Citizen.class);
         ethalonNew = mapper.readValue(ethalonNewJson, Citizen.class);
         ethalonNewIncorrect = mapper.readValue(ethalonNewIncorrectJson, Citizen.class);
-    }
-
-    @Test
-    public void aaa_findAll() {
-        testClient.get().uri("/citizens")
-                .exchange().expectStatus().isOk()
-                .expectBodyList(Citizen.class)
-                .hasSize(10);
     }
 
     @Test
@@ -121,6 +111,17 @@ public class CitizenControllerTest {
                 .expectBody()
                 .jsonPath("$.numberOfElements").isEqualTo(5)
                 .jsonPath("$.totalPages").isEqualTo(2)
+                .jsonPath("$..[?(@.id==5)].dulnumber").isEqualTo(ethalonId5.getDulnumber());
+    }
+
+
+    @Test
+    public void findCitizensPaginatedAndFiltrated() {
+        testClient.get().uri("/citizens?page=0&size=5&name=Treutel&address=Sachtjen&dul=474098")
+                .exchange().expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.numberOfElements").isEqualTo(3)
+                .jsonPath("$.totalPages").isEqualTo(1)
                 .jsonPath("$..[?(@.id==5)].dulnumber").isEqualTo(ethalonId5.getDulnumber());
     }
 }

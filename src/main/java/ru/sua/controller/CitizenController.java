@@ -1,6 +1,7 @@
 package ru.sua.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,17 +11,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.sua.domain.Citizen;
 import ru.sua.repository.CitizenRepository;
+import ru.sua.specification.CitizenListRequest;
+import ru.sua.specification.CitizenListSpecification;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class CitizenController {
 
     private CitizenRepository repository;
+    private CitizenListSpecification specification;
 
     @GetMapping("/citizens/{id}")
     public ResponseEntity<Citizen> getCitizenById(@PathVariable("id") long id) {
@@ -51,18 +55,18 @@ public class CitizenController {
         return ResponseEntity.ok().body(repository.save(citizen));
     }
 
-    @GetMapping(value = "/citizens", params = {"page", "size"})
+    @GetMapping(value = "/citizens") //,  params = {"page", "size", "name", "address", "dul"})
     public Page<Citizen> findCitizensPaginated(@RequestParam("page") int page,
                                                @RequestParam("size") int size,
+                                               @RequestParam(value = "name", required = false) String name,
+                                               @RequestParam(value = "address", required = false) String address,
+                                               @RequestParam(value = "dul", required = false) String dul,
                                                UriComponentsBuilder uriBuilder,
                                                HttpServletResponse response) {
         Pageable pageable = PageRequest.of(page, size);
-        return repository.findAll(pageable);
-    }
-
-    @GetMapping("/citizens") // TODO не по ТЗ. убрать?
-    public List<Citizen> findAll() {
-        return repository.findAll();
+        log.info("\n   >>>>  page={}, size={}, name={}, address={}, dul={}", page, size, name, address, dul);
+        CitizenListRequest searchRequest = new CitizenListRequest(name, dul, address);
+        return repository.findAll(specification.getFilter(searchRequest), pageable);
     }
 
 }
