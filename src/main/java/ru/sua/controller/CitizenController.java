@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.sua.domain.Citizen;
@@ -26,6 +27,7 @@ public class CitizenController {
     private CitizenRepository repository;
     private CitizenListSpecification specification;
 
+    @Secured({"ROLE_READONLY", "ROLE_MODIFICATION"})
     @GetMapping("/citizens/{id}")
     public ResponseEntity<Citizen> getCitizenById(@PathVariable("id") long id) {
         Optional<Citizen> optional = repository.findById(id);
@@ -34,6 +36,7 @@ public class CitizenController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Secured("ROLE_MODIFICATION")
     @PostMapping("/citizens")
     public ResponseEntity<Citizen> createCitizen(@Valid @RequestBody Citizen citizen) {
         //https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
@@ -42,6 +45,7 @@ public class CitizenController {
         return ResponseEntity.ok().body(repository.save(citizen));
     }
 
+    @Secured("ROLE_MODIFICATION")
     @DeleteMapping("/citizens/{id}")
     public ResponseEntity deleteCitizen(@PathVariable("id") long id) {
         if (!repository.existsById(id)) return ResponseEntity.notFound().build();
@@ -49,12 +53,14 @@ public class CitizenController {
         return ResponseEntity.ok().build();
     }
 
+    @Secured("ROLE_MODIFICATION")
     @PutMapping("/citizens/{id}")
     public ResponseEntity<Citizen> updateCitizen(@PathVariable("id") long id, @Valid @RequestBody Citizen citizen) {
         if (!repository.existsById(id)) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().body(repository.save(citizen));
     }
 
+    @Secured({"ROLE_READONLY"})
     @GetMapping(value = "/citizens") //,  params = {"page", "size", "name", "address", "dul"})
     public Page<Citizen> findCitizensPaginated(@RequestParam("page") int page,
                                                @RequestParam("size") int size,

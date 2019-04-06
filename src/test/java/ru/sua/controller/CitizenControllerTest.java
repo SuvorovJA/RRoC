@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import ru.sua.domain.Citizen;
+import ru.sua.security.Constants;
+import ru.sua.security.model.AuthToken;
+import ru.sua.security.model.LoginUser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +36,8 @@ public class CitizenControllerTest {
     private Citizen ethalonNew;
     private Citizen ethalonNewIncorrect;
 
+    private String jwtToken;
+
     @Autowired
     private WebTestClient testClient;
 
@@ -46,19 +50,39 @@ public class CitizenControllerTest {
         ethalonId5Modified = mapper.readValue(ethalonId5ModifiedJson, Citizen.class);
         ethalonNew = mapper.readValue(ethalonNewJson, Citizen.class);
         ethalonNewIncorrect = mapper.readValue(ethalonNewIncorrectJson, Citizen.class);
+
+        getAndInstallAuthTokenFromServer(new LoginUser("faro", "faro-password"));
+
+    }
+
+    private void getAndInstallAuthTokenFromServer(LoginUser loginUser) {
+        WebTestClient.ResponseSpec response = testClient.post().uri("/token")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(loginUser))
+                .exchange().expectStatus().isOk();
+        AuthToken authToken = response.expectBody(AuthToken.class).returnResult().getResponseBody();
+        assertNotNull(authToken);
+        jwtToken = Constants.TOKEN_PREFIX + authToken.getToken();
     }
 
     @Test
     public void getCitizenById() {
         WebTestClient.ResponseSpec response = testClient.get().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
         Citizen citizen = response.expectBody(Citizen.class).returnResult().getResponseBody();
         assertEquals(ethalonId5, citizen);
     }
 
     @Test
+    public void attemptGetCitizenByIdWithoutAuthentication() {
+        testClient.get().uri("/citizens/5").exchange().expectStatus().isForbidden();
+    }
+
+    @Test
     public void zza__createCitizen() {
         WebTestClient.ResponseSpec response = testClient.post().uri("/citizens")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonNew))
                 .exchange().expectStatus().isOk();
@@ -71,27 +95,44 @@ public class CitizenControllerTest {
     @Test
     public void createIncorrectCitizen() {
         testClient.post().uri("/citizens")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonNewIncorrect))
                 .exchange().expectStatus().isBadRequest();
     }
 
     @Test
+    public void attemptDeleteCitizenWithoutAuthorization() {
+        getAndInstallAuthTokenFromServer(new LoginUser("ro", "ro-password"));
+        testClient.delete().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
+                .exchange().expectStatus().isForbidden();
+    }
+
+    @Test
     public void zzz__deleteCitizen() {
-        testClient.get().uri("/citizens/5").exchange().expectStatus().isOk();
-        testClient.delete().uri("/citizens/5").exchange().expectStatus().isOk();
-        testClient.get().uri("/citizens/5").exchange().expectStatus().isNotFound();
+        testClient.get().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
+                .exchange().expectStatus().isOk();
+        testClient.delete().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
+                .exchange().expectStatus().isOk();
+        testClient.get().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
+                .exchange().expectStatus().isNotFound();
     }
 
     @Test
     public void updateCitizen() {
         // первое чтение
         WebTestClient.ResponseSpec responseFirst = testClient.get().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
         Citizen citizenFirst = responseFirst.expectBody(Citizen.class).returnResult().getResponseBody();
         assertEquals(ethalonId5, citizenFirst);
         // модификация
         WebTestClient.ResponseSpec response = testClient.put().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonId5Modified))
                 .exchange().expectStatus().isOk();
@@ -99,6 +140,7 @@ public class CitizenControllerTest {
         assertEquals(ethalonId5Modified, citizen);
         // повторное чтение
         WebTestClient.ResponseSpec responseSecond = testClient.get().uri("/citizens/5")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
         Citizen citizenSecond = responseSecond.expectBody(Citizen.class).returnResult().getResponseBody();
         assertEquals(ethalonId5Modified, citizenSecond);
@@ -107,6 +149,7 @@ public class CitizenControllerTest {
     @Test
     public void findCitizensPaginated() {
         testClient.get().uri("/citizens?page=0&size=5")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.numberOfElements").isEqualTo(5)
@@ -118,6 +161,7 @@ public class CitizenControllerTest {
     @Test
     public void findCitizensPaginatedAndFiltrated() {
         testClient.get().uri("/citizens?page=0&size=5&name=Treutel&address=Sachtjen&dul=474098")
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.numberOfElements").isEqualTo(3)
