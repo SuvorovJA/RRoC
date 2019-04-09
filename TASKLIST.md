@@ -25,15 +25,6 @@
       - [x] по номеру ДУЛ.      
   - [x] ? Методы должны быть реализованы в общепринятом стиле RESTFul
   - [x] Доступ к методам должен быть ограничен, авторизация через JWT
-  
-        Для REST Client:
-        сделать POST на /token с json LoginUser.class в теле {"username":"ro","password":"ro-password"}
-        затем в header добавить полученный токен
-            Authorization: RROC eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJybyI…
-        затем делать REST запросы     
-         
-        пользователи hardcoded inmemory, смотреть в SecurityConfiguration.class
-        контроль доступа организован по ролям
 
   - [x] Приложение должно быть Stateless
   - [x] DTO и доменные модели должны валидироваться штатными средствами java и spring. 
@@ -45,10 +36,3 @@
     - [x] включить тест репозитория на Н2
   - [x] и интеграционные тесты (по принципу чёрного ящика - обращениями по http к рестам).
 
----  
-Дополнительные варианты развития
-- swagger doc
-- uuid id
-- нет CitizenService между restcontroller и repository
-- нет DTO (поскольку Entity "Citizen" без поведения и на basic типах, он же в роли DTO)
-- BCrypt password при получении токена

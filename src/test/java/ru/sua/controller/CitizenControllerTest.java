@@ -1,6 +1,7 @@
 package ru.sua.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -10,17 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import ru.sua.domain.Citizen;
-import ru.sua.security.Constants;
-import ru.sua.security.model.AuthToken;
-import ru.sua.security.model.LoginUser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,13 +31,12 @@ public class CitizenControllerTest {
     private static final String ethalonId5ModifiedJson = "{\"id\":5,\"fullName\":\"Mickey-Treutel\",\"dob\":\"1996-03-19\",\"address\":\"New address\",\"dulnumber\":\"205343909704\"}";
     private static final String ethalonNewJson = "{\"fullName\":\"Mickey-Mouse\",\"dob\":\"1996-06-06\",\"address\":\"Disney\",\"dulnumber\":\"0000000001\"}";
     private static final String ethalonNewIncorrectJson = "{\"fullName\":\"Donald Duck\",\"dulnumber\":\"2\"}";
+    private static final String oauthClientCredentials = "Basic Y2xpZW50SWQ6c2VjcmV0";    // clientId:secret
     private Citizen ethalonId5;
     private Citizen ethalonId5Modified;
     private Citizen ethalonNew;
     private Citizen ethalonNewIncorrect;
-
     private String jwtToken;
-
     @Autowired
     private WebTestClient testClient;
 
@@ -51,18 +50,22 @@ public class CitizenControllerTest {
         ethalonNew = mapper.readValue(ethalonNewJson, Citizen.class);
         ethalonNewIncorrect = mapper.readValue(ethalonNewIncorrectJson, Citizen.class);
 
-        getAndInstallAuthTokenFromServer(new LoginUser("faro", "faro-password"));
+        getAndInstallAuthTokenFromServer("faro", "faro-password");
 
     }
 
-    private void getAndInstallAuthTokenFromServer(LoginUser loginUser) {
-        WebTestClient.ResponseSpec response = testClient.post().uri("/token")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(loginUser))
+    private void getAndInstallAuthTokenFromServer(String login, String password) {
+        WebTestClient.ResponseSpec response = testClient
+                .post()
+                .uri("http://localhost:9000/oauth/token?grant_type=password&username=" + login + "&password=" + password)
+                .headers(h -> h.add("Authorization", oauthClientCredentials))
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(OAuth2AccessToken.class))
                 .exchange().expectStatus().isOk();
-        AuthToken authToken = response.expectBody(AuthToken.class).returnResult().getResponseBody();
+        OAuth2AccessToken authToken = response.expectBody(OAuth2AccessToken.class).returnResult().getResponseBody();
         assertNotNull(authToken);
-        jwtToken = Constants.TOKEN_PREFIX + authToken.getToken();
+        log.info("TOKEN FROM AUTHSERVER IS \'{}\'",authToken.getValue());
+        jwtToken = "bearer " + authToken.getValue();
     }
 
     @Test
@@ -76,7 +79,7 @@ public class CitizenControllerTest {
 
     @Test
     public void attemptGetCitizenByIdWithoutAuthentication() {
-        testClient.get().uri("/citizens/5").exchange().expectStatus().isForbidden();
+        testClient.get().uri("/citizens/5").exchange().expectStatus().isUnauthorized();
     }
 
     @Test
@@ -103,7 +106,7 @@ public class CitizenControllerTest {
 
     @Test
     public void attemptDeleteCitizenWithoutAuthorization() {
-        getAndInstallAuthTokenFromServer(new LoginUser("ro", "ro-password"));
+        getAndInstallAuthTokenFromServer("ro", "ro-password");
         testClient.delete().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isForbidden();
