@@ -11,6 +11,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.sua.domain.Citizen;
+import ru.sua.domain.CitizenDTO;
+import ru.sua.domain.Dto;
 import ru.sua.repository.CitizenRepository;
 import ru.sua.domain.CitizenListRequest;
 
@@ -26,6 +28,7 @@ public class CitizenController {
     private CitizenRepository repository;
     private CitizenListSpecification specification;
 
+    @Dto(CitizenDTO.class)
     @Secured({"ROLE_READONLY", "ROLE_MODIFICATION"})
     @GetMapping("/citizens/{id}")
     public ResponseEntity<Citizen> getCitizenById(@PathVariable("id") long id) {
@@ -35,6 +38,7 @@ public class CitizenController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Dto(CitizenDTO.class)
     @Secured("ROLE_MODIFICATION")
     @PostMapping("/citizens")
     public ResponseEntity<Citizen> createCitizen(@Valid @RequestBody Citizen citizen) {
@@ -52,6 +56,7 @@ public class CitizenController {
         return ResponseEntity.ok().build();
     }
 
+    @Dto(CitizenDTO.class)
     @Secured("ROLE_MODIFICATION")
     @PutMapping("/citizens/{id}")
     public ResponseEntity<Citizen> updateCitizen(@PathVariable("id") long id, @Valid @RequestBody Citizen citizen) {
@@ -59,6 +64,7 @@ public class CitizenController {
         return ResponseEntity.ok().body(repository.save(citizen));
     }
 
+    @Dto(CitizenDTO.class)
     @Secured({"ROLE_READONLY"})
     @GetMapping(value = "/citizens") //,  params = {"page", "size", "name", "address", "dul"})
     public Page<Citizen> findCitizensPaginated(@RequestParam("page") int page,

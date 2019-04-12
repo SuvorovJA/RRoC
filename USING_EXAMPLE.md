@@ -126,3 +126,81 @@ $ curl -v 'localhost:8080/citizens/5' -X DELETE -H "Accept: application/json" -H
 $ curl -v 'localhost:8080/citizens/5' -X GET -H "Accept: application/json" -H "Content-type: application/json" -H "Authorization: bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTQ3OTU2OTIsInVzZXJfbmFtZSI6ImZhcm8iLCJhdXRob3JpdGllcyI6WyJST0xFX01PRElGSUNBVElPTiIsIlJPTEVfUkVBRE9OTFkiXSwianRpIjoiZDI1NmRhYTUtY2U1OC00YzAxLWFkMWMtODM1Yjg5ZjgwZDFhIiwiY2xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.v-xnD0NqpmwMD8neyY-t_X1CnDWVPM1s33HIAthmSCBgSinGGk5CHQIrrhu4i9dOxx2ArQEiCPlz2lEKsbyOHKl0fcUQfUrsy8ivmELn-Ja_lutdBQg40T-IUAZY3oV30DkwTxmMrU-yspYW44mVdAATljNweqXdc957KAZWXJJ-vXAvZfmGzLllCOBq915AEeUg1d09f5ma2eaznBPT2-CAIrBJk8r2J3Z_y6w2DSf6trOQZ5-dyCGKig8UWmSn12qTkPe86G-_wc2vD00L8Tnvfv9WX3i_p4rFH8Oygboc6k_XmZRSh5jN20jdWOsNFhC1wNnkEkQ1PTVXeNDj-Q"
 ... HTTP/1.1 404 ...
 ```
+
+---
+
+
+данный пример отражает работу ModelMapper, в плане того, что RESTController действительно отдаёт DTO-объект а не Domain-объект.
+отличие DTO в отсутствии поля 'dob'
+``` 
+2019-04-13 02:42:36.498  INFO 9269 --- [nio-8080-exec-2] r.s.service.DtoMapperResponseBodyAdvice  : CLASS OF SINGLE MAPPED VALUE IS 'class ru.sua.domain.CitizenDTO'
+```
+```bash
+$ curl localhost:8080/citizens/10 -H "Authorization: bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTUwOTg0MzQsInVzZXJfbmFtZSI6ImZhcm8iLCJhdXRob3JpdGllcyI6WyJST0xFX01PRElGSUNBVElPTiIsIlJPTEVfUkVBRE9OTFkiXSwianRpIjoiNGVmNzZkYzUtYzBlZi00MWM4LWFjYWYtYzJkZjQ2ZjcwZWY5IiwiY2xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.rKtpGg7VGYfNJfUFe5Y_NPMNumhyEPG_ja3fJwf1yhDi_Ne5UVjtq6qLlfq_jau5se9zQsifJ1-Z9KEocoC-MRiRr90fiFEkXtOcJ6Ha8JG_9HKlQ-xrHBfrFpJ-ESImTn4hlzpQJw1ArQ9-SsPHp-b--YNp3faFYGQbX7-SBpdgJK9ytR7B7iwDPeQE47fNq-vau9E24CBIFRp2U53MR3feXcpkRMypq-Zrg_9JONeGl1B09YD5WiLtQpXjM5IX6Cd-Qf-esK797T42RLaFSCFpE5bL5WqA9BHtXbC_AA37yBKokrj421maZ3jnGuk3pjmSSj8Ltxm0XHHvXimNHA"
+```
+```json
+{
+  "id" : 10,
+  "fullName" : "Brooks-Barton",
+  "address" : "8421 Pine View Parkway",
+  "dulnumber" : "7316953795"
+}
+```
+```bash
+$ curl -v 'localhost:8080/citizens?page=0&size=5' -H "Accept: application/json" -H "Content-type: application/json" -H "Authorization: bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTUwOTg0MzQsInVzZXJfbmFtZSI6ImZhcm8iLCJhdXRob3JpdGllcyI6WyJST0xFX01PRElGSUNBVElPTiIsIlJPTEVfUkVBRE9OTFkiXSwianRpIjoiNGVmNzZkYzUtYzBlZi00MWM4LWFjYWYtYzJkZjQ2ZjcwZWY5IiwiY2xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.rKtpGg7VGYfNJfUFe5Y_NPMNumhyEPG_ja3fJwf1yhDi_Ne5UVjtq6qLlfq_jau5se9zQsifJ1-Z9KEocoC-MRiRr90fiFEkXtOcJ6Ha8JG_9HKlQ-xrHBfrFpJ-ESImTn4hlzpQJw1ArQ9-SsPHp-b--YNp3faFYGQbX7-SBpdgJK9ytR7B7iwDPeQE47fNq-vau9E24CBIFRp2U53MR3feXcpkRMypq-Zrg_9JONeGl1B09YD5WiLtQpXjM5IX6Cd-Qf-esK797T42RLaFSCFpE5bL5WqA9BHtXbC_AA37yBKokrj421maZ3jnGuk3pjmSSj8Ltxm0XHHvXimNHA"
+```
+```json
+{
+  "content" : [ {
+    "id" : 1,
+    "fullName" : "Флетчер-Крёйгер",
+    "address" : "1869 Di Loreto Center",
+    "dulnumber" : "8274773873"
+  }, {
+    "id" : 2,
+    "fullName" : "Jenee-Crooks",
+    "address" : "19 Sachtjen Drive",
+    "dulnumber" : "22173309533"
+  }, {
+    "id" : 3,
+    "fullName" : "Pete-Hagenes",
+    "address" : "4440 Laurel Lane",
+    "dulnumber" : "371474"
+  }, {
+    "id" : 4,
+    "fullName" : "King-Cruickshank",
+    "address" : "968 Towne Parkway",
+    "dulnumber" : "121436496169"
+  }, {
+    "id" : 5,
+    "fullName" : "Mickey-Treutel",
+    "address" : "90 Bunker Hill Terrace",
+    "dulnumber" : "205343909704"
+  } ],
+  "pageable" : {
+    "sort" : {
+      "sorted" : false,
+      "unsorted" : true,
+      "empty" : true
+    },
+    "pageSize" : 5,
+    "pageNumber" : 0,
+    "offset" : 0,
+    "paged" : true,
+    "unpaged" : false
+  },
+  "totalPages" : 20,
+  "totalElements" : 100,
+  "last" : false,
+  "first" : true,
+  "number" : 0,
+  "sort" : {
+    "sorted" : false,
+    "unsorted" : true,
+    "empty" : true
+  },
+  "numberOfElements" : 5,
+  "size" : 5,
+  "empty" : false
+}
+```

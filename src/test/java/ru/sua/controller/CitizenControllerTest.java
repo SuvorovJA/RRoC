@@ -7,6 +7,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import ru.sua.domain.Citizen;
+import ru.sua.domain.CitizenDTO;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -32,11 +34,15 @@ public class CitizenControllerTest {
     private static final String ethalonNewJson = "{\"fullName\":\"Mickey-Mouse\",\"dob\":\"1996-06-06\",\"address\":\"Disney\",\"dulnumber\":\"0000000001\"}";
     private static final String ethalonNewIncorrectJson = "{\"fullName\":\"Donald Duck\",\"dulnumber\":\"2\"}";
     private static final String oauthClientCredentials = "Basic Y2xpZW50SWQ6c2VjcmV0";    // clientId:secret
-    private Citizen ethalonId5;
-    private Citizen ethalonId5Modified;
-    private Citizen ethalonNew;
-    private Citizen ethalonNewIncorrect;
+    private CitizenDTO ethalonId5;
+    private Citizen ethalonId5ModifiedAsCitizenDomainClass;
+    private Citizen ethalonNewAsCitizenDomainClass;
+    private CitizenDTO ethalonNewIncorrect;
     private String jwtToken;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Autowired
     private WebTestClient testClient;
 
@@ -45,10 +51,10 @@ public class CitizenControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        ethalonId5 = mapper.readValue(ethalonId5Json, Citizen.class);
-        ethalonId5Modified = mapper.readValue(ethalonId5ModifiedJson, Citizen.class);
-        ethalonNew = mapper.readValue(ethalonNewJson, Citizen.class);
-        ethalonNewIncorrect = mapper.readValue(ethalonNewIncorrectJson, Citizen.class);
+        ethalonId5 = mapper.readValue(ethalonId5Json, CitizenDTO.class);
+        ethalonId5ModifiedAsCitizenDomainClass = mapper.readValue(ethalonId5ModifiedJson, Citizen.class);
+        ethalonNewAsCitizenDomainClass = mapper.readValue(ethalonNewJson, Citizen.class);
+        ethalonNewIncorrect = mapper.readValue(ethalonNewIncorrectJson, CitizenDTO.class);
 
         getAndInstallAuthTokenFromServer("faro", "faro-password");
 
@@ -73,7 +79,7 @@ public class CitizenControllerTest {
         WebTestClient.ResponseSpec response = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        Citizen citizen = response.expectBody(Citizen.class).returnResult().getResponseBody();
+        CitizenDTO citizen = response.expectBody(CitizenDTO.class).returnResult().getResponseBody();
         assertEquals(ethalonId5, citizen);
     }
 
@@ -87,12 +93,12 @@ public class CitizenControllerTest {
         WebTestClient.ResponseSpec response = testClient.post().uri("/citizens")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(ethalonNew))
+                .body(BodyInserters.fromObject(ethalonNewAsCitizenDomainClass))
                 .exchange().expectStatus().isOk();
-        Citizen citizen = response.expectBody(Citizen.class).returnResult().getResponseBody();
+        CitizenDTO citizen = response.expectBody(CitizenDTO.class).returnResult().getResponseBody();
         assertNotNull(citizen);
-        ethalonNew.setId(citizen.getId());
-        assertEquals(ethalonNew, citizen);
+        ethalonNewAsCitizenDomainClass.setId(citizen.getId());
+        assertEquals(modelMapper.map(ethalonNewAsCitizenDomainClass,CitizenDTO.class), citizen);
     }
 
     @Test
@@ -131,22 +137,22 @@ public class CitizenControllerTest {
         WebTestClient.ResponseSpec responseFirst = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        Citizen citizenFirst = responseFirst.expectBody(Citizen.class).returnResult().getResponseBody();
+        CitizenDTO citizenFirst = responseFirst.expectBody(CitizenDTO.class).returnResult().getResponseBody();
         assertEquals(ethalonId5, citizenFirst);
         // модификация
         WebTestClient.ResponseSpec response = testClient.put().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(ethalonId5Modified))
+                .body(BodyInserters.fromObject(ethalonId5ModifiedAsCitizenDomainClass))
                 .exchange().expectStatus().isOk();
-        Citizen citizen = response.expectBody(Citizen.class).returnResult().getResponseBody();
-        assertEquals(ethalonId5Modified, citizen);
+        CitizenDTO citizen = response.expectBody(CitizenDTO.class).returnResult().getResponseBody();
+        assertEquals(modelMapper.map(ethalonId5ModifiedAsCitizenDomainClass,CitizenDTO.class), citizen);
         // повторное чтение
         WebTestClient.ResponseSpec responseSecond = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        Citizen citizenSecond = responseSecond.expectBody(Citizen.class).returnResult().getResponseBody();
-        assertEquals(ethalonId5Modified, citizenSecond);
+        CitizenDTO citizenSecond = responseSecond.expectBody(CitizenDTO.class).returnResult().getResponseBody();
+        assertEquals(modelMapper.map(ethalonId5ModifiedAsCitizenDomainClass,CitizenDTO.class), citizenSecond);
     }
 
     @Test
