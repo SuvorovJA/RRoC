@@ -1,4 +1,4 @@
-package ru.sua.specification;
+package ru.sua.controller;
 
 import org.springframework.data.jpa.domain.Specification;
 

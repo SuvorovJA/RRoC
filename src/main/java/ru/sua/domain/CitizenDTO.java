@@ -1,14 +1,19 @@
-package ru.sua.specification;
+package ru.sua.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CitizenListRequest {
+public class CitizenDTO {
+    private long id;
     private String fullName;
-    private String dulnumber;
+    private Date dob;
     private String address;
+    private String dulnumber;
 }

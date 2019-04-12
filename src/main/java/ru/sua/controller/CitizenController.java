@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.sua.domain.Citizen;
 import ru.sua.repository.CitizenRepository;
-import ru.sua.specification.CitizenListRequest;
-import ru.sua.specification.CitizenListSpecification;
+import ru.sua.domain.CitizenListRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;

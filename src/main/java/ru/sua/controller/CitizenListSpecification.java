@@ -1,9 +1,11 @@
-package ru.sua.specification;
+package ru.sua.controller;
 
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import ru.sua.controller.BaseSpecification;
 import ru.sua.domain.Citizen;
+import ru.sua.domain.CitizenListRequest;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
