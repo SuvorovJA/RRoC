@@ -1,4 +1,4 @@
-package ru.sua.controller;
+package ru.sua.rroc.controller;
 
 import org.springframework.data.jpa.domain.Specification;
 

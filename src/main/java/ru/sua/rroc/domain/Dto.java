@@ -1,4 +1,4 @@
-package ru.sua.domain;
+package ru.sua.rroc.domain;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -133,7 +133,7 @@ $ curl -v 'localhost:8080/citizens/5' -X GET -H "Accept: application/json" -H "C
 данный пример отражает работу ModelMapper, в плане того, что RESTController действительно отдаёт DTO-объект а не Domain-объект.
 отличие DTO в отсутствии поля 'dob'
 ``` 
-2019-04-13 02:42:36.498  INFO 9269 --- [nio-8080-exec-2] r.s.service.DtoMapperResponseBodyAdvice  : CLASS OF SINGLE MAPPED VALUE IS 'class ru.sua.domain.CitizenDTO'
+2019-04-13 02:42:36.498  INFO 9269 --- [nio-8080-exec-2] r.s.service.DtoMapperResponseBodyAdvice  : CLASS OF SINGLE MAPPED VALUE IS 'class ru.sua.rroc.domain.CitizenDTO'
 ```
 ```bash
 $ curl localhost:8080/citizens/10 -H "Authorization: bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTUwOTg0MzQsInVzZXJfbmFtZSI6ImZhcm8iLCJhdXRob3JpdGllcyI6WyJST0xFX01PRElGSUNBVElPTiIsIlJPTEVfUkVBRE9OTFkiXSwianRpIjoiNGVmNzZkYzUtYzBlZi00MWM4LWFjYWYtYzJkZjQ2ZjcwZWY5IiwiY2xpZW50X2lkIjoiY2xpZW50SWQiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXX0.rKtpGg7VGYfNJfUFe5Y_NPMNumhyEPG_ja3fJwf1yhDi_Ne5UVjtq6qLlfq_jau5se9zQsifJ1-Z9KEocoC-MRiRr90fiFEkXtOcJ6Ha8JG_9HKlQ-xrHBfrFpJ-ESImTn4hlzpQJw1ArQ9-SsPHp-b--YNp3faFYGQbX7-SBpdgJK9ytR7B7iwDPeQE47fNq-vau9E24CBIFRp2U53MR3feXcpkRMypq-Zrg_9JONeGl1B09YD5WiLtQpXjM5IX6Cd-Qf-esK797T42RLaFSCFpE5bL5WqA9BHtXbC_AA37yBKokrj421maZ3jnGuk3pjmSSj8Ltxm0XHHvXimNHA"

@@ -1,4 +1,4 @@
-package ru.sua.controller;
+package ru.sua.rroc.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +16,12 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import ru.sua.domain.Citizen;
-import ru.sua.domain.CitizenDTO;
+import ru.sua.rroc.domain.Citizen;
+import ru.sua.rroc.domain.CitizenDTO;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.net.URI;
+
+import static org.junit.Assert.*;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -70,7 +71,7 @@ public class CitizenControllerTest {
                 .exchange().expectStatus().isOk();
         OAuth2AccessToken authToken = response.expectBody(OAuth2AccessToken.class).returnResult().getResponseBody();
         assertNotNull(authToken);
-        log.info("TOKEN FROM AUTHSERVER IS \'{}\'",authToken.getValue());
+        log.info("TOKEN FROM AUTHSERVER IS \'{}\'", authToken.getValue());
         jwtToken = "bearer " + authToken.getValue();
     }
 
@@ -94,11 +95,21 @@ public class CitizenControllerTest {
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonNewAsCitizenDomainClass))
+                .exchange().expectStatus().isCreated();
+
+        URI location = getLocationUri(response);
+
+        String[] path = location.getPath().split("/");
+        String id = path[path.length - 1];
+        assertNotNull(id);
+
+        // reread created
+        WebTestClient.ResponseSpec responseSecond = testClient.get().uri("/citizens/" + id)
+                .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        CitizenDTO citizen = response.expectBody(CitizenDTO.class).returnResult().getResponseBody();
+        CitizenDTO citizen = responseSecond.expectBody(CitizenDTO.class).returnResult().getResponseBody();
         assertNotNull(citizen);
-        ethalonNewAsCitizenDomainClass.setId(citizen.getId());
-        assertEquals(modelMapper.map(ethalonNewAsCitizenDomainClass,CitizenDTO.class), citizen);
+        assertEquals(ethalonNewAsCitizenDomainClass.getDulnumber(), citizen.getDulnumber());
     }
 
     @Test
@@ -139,20 +150,34 @@ public class CitizenControllerTest {
                 .exchange().expectStatus().isOk();
         CitizenDTO citizenFirst = responseFirst.expectBody(CitizenDTO.class).returnResult().getResponseBody();
         assertEquals(ethalonId5, citizenFirst);
+
         // модификация
         WebTestClient.ResponseSpec response = testClient.put().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonId5ModifiedAsCitizenDomainClass))
-                .exchange().expectStatus().isOk();
-        CitizenDTO citizen = response.expectBody(CitizenDTO.class).returnResult().getResponseBody();
-        assertEquals(modelMapper.map(ethalonId5ModifiedAsCitizenDomainClass,CitizenDTO.class), citizen);
+                .exchange().expectStatus().isCreated();
+
+        URI location = getLocationUri(response);
+
+        assertEquals("/citizens/5", location.getPath());
+
         // повторное чтение
         WebTestClient.ResponseSpec responseSecond = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
         CitizenDTO citizenSecond = responseSecond.expectBody(CitizenDTO.class).returnResult().getResponseBody();
-        assertEquals(modelMapper.map(ethalonId5ModifiedAsCitizenDomainClass,CitizenDTO.class), citizenSecond);
+        assertEquals(modelMapper.map(ethalonId5ModifiedAsCitizenDomainClass, CitizenDTO.class), citizenSecond);
+    }
+
+    private URI getLocationUri(WebTestClient.ResponseSpec response) {
+        log.info("Response headers: \'{}\'", response.expectBody().returnResult().getResponseHeaders());
+
+        assertTrue(response.expectBody().returnResult().getResponseHeaders().containsKey("Location"));
+        URI location = response.expectBody().returnResult().getResponseHeaders().getLocation();
+        assertNotNull(location);
+        log.info("Response Location header: \'{}\'", location);
+        return location;
     }
 
     @Test

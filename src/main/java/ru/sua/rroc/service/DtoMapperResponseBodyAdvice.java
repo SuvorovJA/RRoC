@@ -1,4 +1,4 @@
-package ru.sua.service;
+package ru.sua.rroc.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
-import ru.sua.domain.Dto;
+import ru.sua.rroc.domain.Dto;
 
 import java.util.Collection;
 

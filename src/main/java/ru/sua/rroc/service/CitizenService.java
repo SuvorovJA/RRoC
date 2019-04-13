@@ -1,12 +1,12 @@
-package ru.sua.service;
+package ru.sua.rroc.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.sua.domain.Citizen;
-import ru.sua.repository.CitizenRepository;
+import ru.sua.rroc.domain.Citizen;
+import ru.sua.rroc.repository.CitizenRepository;
 
 import java.util.Optional;
 

@@ -1,23 +1,28 @@
-package ru.sua.repository;
+package ru.sua.rroc.repository;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.sua.domain.Citizen;
+import ru.sua.rroc.domain.Citizen;
+import ru.sua.rroc.service.CitizenService;
 
-import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 
+/**
+ * данный класс полностью повторяет CitizenRepositoryTest
+ * с поправкой на работу через CitizenService
+ */
+
 @RunWith(SpringRunner.class)
-@DataJpaTest
+@SpringBootTest
 @AutoConfigureTestDatabase
-public class CitizenRepositoryTest {
+public class CitizenServiceTest {
 
 
     private final String stringIncorrectFullnameChars = "A_Z_9";
@@ -29,14 +34,13 @@ public class CitizenRepositoryTest {
     private final String stringCorrectAddress = "Адрес Street";
     private final Date dateCorrectDate = new Date();
     private final long sampleId = 11L;
+
     @Autowired
-    private EntityManager entityManager;
-    @Autowired
-    private CitizenRepository repository;
+    private CitizenService service;
 
     @Test
     public void readingFlywyaDataTest() {
-        Optional<Citizen> optional = repository.findById(1L);
+        Optional<Citizen> optional = service.findById(1L);
         assertTrue(optional.isPresent());
         Citizen citizen = optional.get();
         assertEquals("Флетчер-Крёигер", citizen.getFullName());
@@ -44,7 +48,7 @@ public class CitizenRepositoryTest {
 
     @Test
     public void searchByNameFlywyaDataTest() {
-        Citizen citizen = repository.findByFullName("Jenee-Crooks");
+        Citizen citizen = service.findByFullName("Jenee-Crooks");
         assertNotNull(citizen);
         assertEquals("22173309533", citizen.getDulnumber());
     }
@@ -58,8 +62,8 @@ public class CitizenRepositoryTest {
                 stringCorrectAddress,
                 stringCorrectDulnumber);
         System.out.println(citizen);
-        repository.save(citizen);
-        Citizen readedCitizen = repository.findByFullName(stringCorrectFullnameChars);
+        service.save(citizen);
+        Citizen readedCitizen = service.findByFullName(stringCorrectFullnameChars);
         assertNotNull(readedCitizen);
         assertEquals(citizen.getDulnumber(), readedCitizen.getDulnumber());
     }
@@ -72,8 +76,7 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        repository.save(citizen);
-        entityManager.flush();
+        service.save(citizen);
     }
 
     @Test(expected = javax.validation.ConstraintViolationException.class)
@@ -84,8 +87,7 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        repository.save(citizen);
-        entityManager.flush();
+        service.save(citizen);
     }
 
     @Test(expected = javax.validation.ConstraintViolationException.class)
@@ -96,8 +98,7 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringShortDulnumber);
-        repository.save(citizen);
-        entityManager.flush();
+        service.save(citizen);
     }
 
     @Test(expected = javax.validation.ConstraintViolationException.class)
@@ -108,8 +109,7 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringLongDulnumber);
-        repository.save(citizen);
-        entityManager.flush();
+        service.save(citizen);
     }
 
     @Test(expected = javax.validation.ConstraintViolationException.class)
@@ -120,7 +120,6 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 string101chars + string101chars,
                 stringLongDulnumber);
-        repository.save(citizen);
-        entityManager.flush();
+        service.save(citizen);
     }
 }

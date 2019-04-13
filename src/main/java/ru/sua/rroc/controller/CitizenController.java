@@ -1,4 +1,4 @@
-package ru.sua.controller;
+package ru.sua.rroc.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +9,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.sua.domain.Citizen;
-import ru.sua.domain.CitizenDTO;
-import ru.sua.domain.Dto;
-import ru.sua.repository.CitizenRepository;
-import ru.sua.domain.CitizenListRequest;
+import ru.sua.rroc.domain.Citizen;
+import ru.sua.rroc.domain.CitizenDTO;
+import ru.sua.rroc.domain.CitizenListRequest;
+import ru.sua.rroc.domain.Dto;
+import ru.sua.rroc.repository.CitizenRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.Optional;
 
 @RestController
@@ -42,17 +44,23 @@ public class CitizenController {
     @Secured("ROLE_MODIFICATION")
     @PostMapping("/citizens")
     public ResponseEntity<Citizen> createCitizen(@Valid @RequestBody Citizen citizen) {
-        //https://stackoverflow.com/questions/3825990/http-response-code-for-post-when-resource-already-exists
+        //https://developer.mozilla.org/ru/docs/Web/HTTP/Status
         if (citizen.getId() > 0 && repository.existsById(citizen.getId()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        return ResponseEntity.ok().body(repository.save(citizen));
+            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
+        Citizen created = repository.save(citizen);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(created.getId()).toUri();
+
+        return ResponseEntity.created(location).build(); // 201 created
     }
 
     @Secured("ROLE_MODIFICATION")
     @DeleteMapping("/citizens/{id}")
     public ResponseEntity deleteCitizen(@PathVariable("id") long id) {
         if (!repository.existsById(id)) return ResponseEntity.notFound().build();
+
         repository.deleteById(id);
+
         return ResponseEntity.ok().build();
     }
 
@@ -61,7 +69,13 @@ public class CitizenController {
     @PutMapping("/citizens/{id}")
     public ResponseEntity<Citizen> updateCitizen(@PathVariable("id") long id, @Valid @RequestBody Citizen citizen) {
         if (!repository.existsById(id)) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok().body(repository.save(citizen));
+
+        Citizen created = repository.save(citizen);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+
+        return ResponseEntity.created(location).build(); // 201 created
+
     }
 
     @Dto(CitizenDTO.class)

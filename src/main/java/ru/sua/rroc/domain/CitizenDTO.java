@@ -1,4 +1,4 @@
-package ru.sua.domain;
+package ru.sua.rroc.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

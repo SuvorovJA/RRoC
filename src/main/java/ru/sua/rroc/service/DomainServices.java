@@ -1,4 +1,4 @@
-package ru.sua.service;
+package ru.sua.rroc.service;
 
 
 import org.springframework.data.domain.Page;
