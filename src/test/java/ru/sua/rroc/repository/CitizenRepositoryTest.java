@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.sua.rroc.domain.Citizen;
 
@@ -16,7 +17,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CitizenRepositoryTest {
 
 
@@ -39,7 +40,7 @@ public class CitizenRepositoryTest {
         Optional<Citizen> optional = repository.findById(1L);
         assertTrue(optional.isPresent());
         Citizen citizen = optional.get();
-        assertEquals("Флетчер-Крёигер", citizen.getFullName());
+        assertEquals("Флетчер-Крёйгер", citizen.getFullName());
     }
 
     @Test

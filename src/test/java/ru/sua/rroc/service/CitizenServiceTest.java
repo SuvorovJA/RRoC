@@ -1,27 +1,31 @@
-package ru.sua.rroc.repository;
+package ru.sua.rroc.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.TransactionSystemException;
 import ru.sua.rroc.domain.Citizen;
-import ru.sua.rroc.service.CitizenService;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
 
 /**
- * данный класс полностью повторяет CitizenRepositoryTest
+ * данный класс полностью(почти) повторяет CitizenRepositoryTest
  * с поправкой на работу через CitizenService
  */
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CitizenServiceTest {
 
 
@@ -43,7 +47,7 @@ public class CitizenServiceTest {
         Optional<Citizen> optional = service.findById(1L);
         assertTrue(optional.isPresent());
         Citizen citizen = optional.get();
-        assertEquals("Флетчер-Крёигер", citizen.getFullName());
+        assertEquals("Флетчер-Крёйгер", citizen.getFullName());
     }
 
     @Test
@@ -68,7 +72,7 @@ public class CitizenServiceTest {
         assertEquals(citizen.getDulnumber(), readedCitizen.getDulnumber());
     }
 
-    @Test(expected = javax.validation.ConstraintViolationException.class)
+    @Test
     public void saveNewIvalidCitizen_FullnameFieldTest() {
         Citizen citizen = new Citizen(
                 sampleId + 1,
@@ -76,10 +80,14 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        service.save(citizen);
+        try {
+            service.save(citizen);
+        } catch (TransactionSystemException e) {
+            assertExpectedNestedException(e);
+        }
     }
 
-    @Test(expected = javax.validation.ConstraintViolationException.class)
+    @Test
     public void saveNewIvalidCitizen_LongFullnameFieldTest() {
         Citizen citizen = new Citizen(
                 sampleId + 1,
@@ -87,10 +95,14 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        service.save(citizen);
+        try {
+            service.save(citizen);
+        } catch (TransactionSystemException e) {
+            assertExpectedNestedException(e);
+        }
     }
 
-    @Test(expected = javax.validation.ConstraintViolationException.class)
+    @Test
     public void saveNewIvalidCitizen_ShortDulnumberFieldTest() {
         Citizen citizen = new Citizen(
                 sampleId + 1,
@@ -98,10 +110,14 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringShortDulnumber);
-        service.save(citizen);
+        try {
+            service.save(citizen);
+        } catch (TransactionSystemException e) {
+            assertExpectedNestedException(e);
+        }
     }
 
-    @Test(expected = javax.validation.ConstraintViolationException.class)
+    @Test
     public void saveNewIvalidCitizen_LongDulnumberFieldTest() {
         Citizen citizen = new Citizen(
                 sampleId + 1,
@@ -109,10 +125,14 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringLongDulnumber);
-        service.save(citizen);
+        try {
+            service.save(citizen);
+        } catch (TransactionSystemException e) {
+            assertExpectedNestedException(e);
+        }
     }
 
-    @Test(expected = javax.validation.ConstraintViolationException.class)
+    @Test
     public void saveNewIvalidCitizen_LongAddressFieldTest() {
         Citizen citizen = new Citizen(
                 sampleId + 1,
@@ -120,6 +140,17 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 string101chars + string101chars,
                 stringLongDulnumber);
-        service.save(citizen);
+        try {
+            service.save(citizen);
+        } catch (TransactionSystemException e) {
+            assertExpectedNestedException(e);
+        }
+    }
+
+    private void assertExpectedNestedException(TransactionSystemException e) {
+        log.info(e.getCause().getCause().getClass().toString());
+        if (!(e.getCause().getCause() instanceof ConstraintViolationException)) {
+            Assert.fail("unexpected exception");
+        }
     }
 }

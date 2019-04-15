@@ -89,7 +89,7 @@ public class CitizenController {
                                                UriComponentsBuilder uriBuilder,
                                                HttpServletResponse response) {
         Pageable pageable = PageRequest.of(page, size);
-        log.info("\n   >>>>  page={}, size={}, name={}, address={}, dul={}", page, size, name, address, dul);
+        log.info("\n   REQUESTED: page={}, size={}, name={}, address={}, dul={}", page, size, name, address, dul);
         CitizenListRequest searchRequest = new CitizenListRequest(name, dul, address);
         return repository.findAll(specification.getFilter(searchRequest), pageable);
     }

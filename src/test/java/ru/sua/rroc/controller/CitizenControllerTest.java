@@ -77,7 +77,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void getCitizenById() {
+    public void aad__getCitizenById() {
         WebTestClient.ResponseSpec response = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
@@ -91,7 +91,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void zza__createCitizen() {
+    public void aac__createCitizen() {
         WebTestClient.ResponseSpec response = testClient.post().uri("/citizens")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -131,20 +131,20 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void zzz__deleteCitizen() {
-        testClient.get().uri("/citizens/5")
+    public void aab__deleteCitizen() {
+        testClient.get().uri("/citizens/95")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        testClient.delete().uri("/citizens/5")
+        testClient.delete().uri("/citizens/95")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
-        testClient.get().uri("/citizens/5")
+        testClient.get().uri("/citizens/95")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isNotFound();
     }
 
     @Test
-    public void updateCitizen() {
+    public void aae__updateCitizen() {
         // первое чтение
         WebTestClient.ResponseSpec responseFirst = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
@@ -182,13 +182,13 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void findCitizensPaginated() {
-        testClient.get().uri("/citizens?page=0&size=5")
+    public void aaa__findCitizensPaginated() {
+        testClient.get().uri("/citizens?page=0&size=15")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.numberOfElements").isEqualTo(5)
-                .jsonPath("$.totalPages").isEqualTo(2)
+                .jsonPath("$.numberOfElements").isEqualTo(15)
+                .jsonPath("$.totalPages").isEqualTo(7)
                 .jsonPath("$..[?(@.id==5)].dulnumber").isEqualTo(ethalonId5.getDulnumber());
     }
 
