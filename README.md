@@ -16,7 +16,8 @@
 - Security
 - JWT
   - в коммите e4e84ee - реализация на io.jsonwebtoken.jjwt
-  - начиная с коммита 8e034cb - реализация на spring-security-jwt, с отделением authserver в отдельный проект (репозиторий [SSJWT](https://github.com/SuvorovJA/SSJWT)). Authserver теперь требует отдельного запуска, в том числе и до тестов. Фактически - микросервис. 
+  - начиная с коммита 8e034cb - реализация на spring-security-jwt, с отделением authserver в отдельный проект (репозиторий [SSJWT](https://github.com/SuvorovJA/SSJWT)). Authserver теперь требует отдельного запуска, в том числе и до тестов. Фактически - микросервис.
+  - база данных и authserver оформлены в docker-микросервис
 - PostgreSQL 10
   - оба проекта используют Postgresql. RRoC - использует database 'postgres'. SSJWT - использует database 'authserver'
 - Flyway

@@ -22,7 +22,7 @@
 
 ---
 
-- [ ] Докеризация микросервиса [SSJWT](https://github.com/SuvorovJA/SSJWT)
+- [x] Докеризация микросервиса [SSJWT](https://github.com/SuvorovJA/SSJWT)
 
 - [ ] эти же пункты проверить для [SSJWT](https://github.com/SuvorovJA/SSJWT)
 
