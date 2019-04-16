@@ -1,12 +1,16 @@
 package ru.sua.rroc.repository;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.PostgreSQLContainer;
+import ru.sua.rroc.IntegrationTestInitializer;
+import ru.sua.rroc.TestPostgresqlContainer;
 import ru.sua.rroc.domain.Citizen;
 
 import javax.persistence.EntityManager;
@@ -18,8 +22,11 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(initializers = IntegrationTestInitializer.class)
 public class CitizenRepositoryTest {
 
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = TestPostgresqlContainer.getInstance();
 
     private final String stringIncorrectFullnameChars = "A_Z_9";
     private final String string101chars = "DuplicateJsonObjectContextCustomizerFactory-DuplicateJsonObjectContextCustomizer-DuplicateJsonObjectC";

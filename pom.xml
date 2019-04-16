@@ -12,13 +12,13 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <h2.version>1.4.197</h2.version>
         <postgresql.driver.version>42.2.5</postgresql.driver.version>
         <spring-security-jwt.version>1.0.10.RELEASE</spring-security-jwt.version>
         <spring-security-oauth2.version>2.3.5.RELEASE</spring-security-oauth2.version>
         <javax-xml-bind.version>2.3.0</javax-xml-bind.version>
         <spring-security-oauth2-client.version>5.1.5.RELEASE</spring-security-oauth2-client.version>
         <modelmapper.version>2.3.2</modelmapper.version>
+        <testcontainers.version>1.11.1</testcontainers.version>
     </properties>
 
     <parent>
@@ -93,9 +93,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 

@@ -2,13 +2,18 @@ package ru.sua.rroc.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
+import org.testcontainers.containers.PostgreSQLContainer;
+import ru.sua.rroc.IntegrationTestInitializer;
+import ru.sua.rroc.TestPostgresqlContainer;
 import ru.sua.rroc.domain.Citizen;
 
 import javax.validation.ConstraintViolationException;
@@ -26,8 +31,11 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(initializers = IntegrationTestInitializer.class)
 public class CitizenServiceTest {
 
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = TestPostgresqlContainer.getInstance();
 
     private final String stringIncorrectFullnameChars = "A_Z_9";
     private final String string101chars = "DuplicateJsonObjectContextCustomizerFactory-DuplicateJsonObjectContextCustomizer-DuplicateJsonObjectC";

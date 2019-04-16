@@ -3,6 +3,7 @@
     - [x] согласовать миграции теста и апп, или убрать миграции из теста
     - [x] заменить h2 на postgresql, 
     - [ ] testcontainers для запуска микросервиса ssjwt     
+    - [x] testcontainers для postgresql     
     
 - [x] DTO для контроллера
 
