@@ -3,6 +3,7 @@ package ru.sua.rroc.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +14,14 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.testcontainers.containers.PostgreSQLContainer;
+import ru.sua.rroc.IntegrationTestInitializer;
+import ru.sua.rroc.TestPostgresqlContainer;
+import ru.sua.rroc.TestSsjwtComposeContainer;
 import ru.sua.rroc.domain.Citizen;
 import ru.sua.rroc.domain.CitizenDTO;
 
@@ -28,6 +34,7 @@ import static org.junit.Assert.*;
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@ContextConfiguration(initializers = IntegrationTestInitializer.class)
 public class CitizenControllerTest {
 
     private static final String ETHALON_ID_5_JSON = "{\"id\":5,\"fullName\":\"Mickey-Treutel\",\"dob\":\"1996-03-19\",\"address\":\"90 Bunker Hill Terrace\",\"dulnumber\":\"205343909704\"}";
@@ -35,7 +42,13 @@ public class CitizenControllerTest {
     private static final String ETHALON_NEW_JSON = "{\"fullName\":\"Mickey-Mouse\",\"dob\":\"1996-06-06\",\"address\":\"Disney\",\"dulnumber\":\"0000000001\"}";
     private static final String ETHALON_NEW_INCORRECT_JSON = "{\"fullName\":\"Donald Duck\",\"dulnumber\":\"2\"}";
     private static final String OAUTH_CLIENT_CREDENTIALS = "Basic Y2xpZW50SWQ6c2VjcmV0";    // clientId:secret
-    private static final String AUTH_SERVER_NAME = "ssjwt.docker:9000";
+
+    @ClassRule
+    public static TestSsjwtComposeContainer ssjwtContainer = TestSsjwtComposeContainer.getInstance();
+
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = TestPostgresqlContainer.getInstance();
+
     private CitizenDTO ethalonId5;
     private Citizen ethalonId5ModifiedAsCitizenDomainClass;
     private Citizen ethalonNewAsCitizenDomainClass;
@@ -63,6 +76,7 @@ public class CitizenControllerTest {
     }
 
     private void getAndInstallAuthTokenFromServer(String login, String password) {
+        final String AUTH_SERVER_NAME = ssjwtContainer.getUrl();
         WebTestClient.ResponseSpec response = testClient
                 .post()
                 .uri("http://" + AUTH_SERVER_NAME + "/oauth/token?grant_type=password&username=" + login + "&password=" + password)
@@ -77,7 +91,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void aad__getCitizenById() {
+    public void getCitizenById() {
         WebTestClient.ResponseSpec response = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
@@ -91,7 +105,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void aac__createCitizen() {
+    public void createCitizen() {
         WebTestClient.ResponseSpec response = testClient.post().uri("/citizens")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -131,7 +145,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void aab__deleteCitizen() {
+    public void deleteCitizen() {
         testClient.get().uri("/citizens/95")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk();
@@ -144,7 +158,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void aae__updateCitizen() {
+    public void updateCitizen() {
         // первое чтение
         WebTestClient.ResponseSpec responseFirst = testClient.get().uri("/citizens/5")
                 .headers(h -> h.add("Authorization", jwtToken))
@@ -182,7 +196,7 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void aaa__findCitizensPaginated() {
+    public void findCitizensPaginated() {
         testClient.get().uri("/citizens?page=0&size=15")
                 .headers(h -> h.add("Authorization", jwtToken))
                 .exchange().expectStatus().isOk()

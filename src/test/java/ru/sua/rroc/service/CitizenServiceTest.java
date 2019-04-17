@@ -65,6 +65,7 @@ public class CitizenServiceTest {
         assertEquals("22173309533", citizen.getDulnumber());
     }
 
+    @SuppressWarnings("Duplicates")
     @Test
     public void saveNewValidCitizenTest() {
         Citizen citizen = new Citizen(
@@ -73,7 +74,6 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        System.out.println(citizen);
         service.save(citizen);
         Citizen readedCitizen = service.findByFullName(stringCorrectFullnameChars);
         assertNotNull(readedCitizen);
@@ -88,11 +88,7 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        try {
-            service.save(citizen);
-        } catch (TransactionSystemException e) {
-            assertExpectedNestedException(e);
-        }
+        serviceSaveWithAssertion(citizen);
     }
 
     @Test
@@ -103,11 +99,7 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        try {
-            service.save(citizen);
-        } catch (TransactionSystemException e) {
-            assertExpectedNestedException(e);
-        }
+        serviceSaveWithAssertion(citizen);
     }
 
     @Test
@@ -118,11 +110,7 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringShortDulnumber);
-        try {
-            service.save(citizen);
-        } catch (TransactionSystemException e) {
-            assertExpectedNestedException(e);
-        }
+        serviceSaveWithAssertion(citizen);
     }
 
     @Test
@@ -133,11 +121,7 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringLongDulnumber);
-        try {
-            service.save(citizen);
-        } catch (TransactionSystemException e) {
-            assertExpectedNestedException(e);
-        }
+        serviceSaveWithAssertion(citizen);
     }
 
     @Test
@@ -148,6 +132,10 @@ public class CitizenServiceTest {
                 dateCorrectDate,
                 string101chars + string101chars,
                 stringLongDulnumber);
+        serviceSaveWithAssertion(citizen);
+    }
+
+    private void serviceSaveWithAssertion(Citizen citizen) {
         try {
             service.save(citizen);
         } catch (TransactionSystemException e) {

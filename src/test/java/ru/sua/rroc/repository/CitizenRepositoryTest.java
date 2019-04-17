@@ -57,6 +57,7 @@ public class CitizenRepositoryTest {
         assertEquals("22173309533", citizen.getDulnumber());
     }
 
+    @SuppressWarnings("Duplicates")
     @Test
     public void saveNewValidCitizenTest() {
         Citizen citizen = new Citizen(
@@ -65,7 +66,6 @@ public class CitizenRepositoryTest {
                 dateCorrectDate,
                 stringCorrectAddress,
                 stringCorrectDulnumber);
-        System.out.println(citizen);
         repository.save(citizen);
         Citizen readedCitizen = repository.findByFullName(stringCorrectFullnameChars);
         assertNotNull(readedCitizen);

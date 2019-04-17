@@ -16,9 +16,18 @@
 - Security
 - JWT
   - в коммите e4e84ee - реализация на io.jsonwebtoken.jjwt
-  - начиная с коммита 8e034cb - реализация на spring-security-jwt, с отделением authserver в отдельный проект (репозиторий [SSJWT](https://github.com/SuvorovJA/SSJWT)). Authserver теперь требует отдельного запуска, в том числе и до тестов. Фактически - микросервис.
-  - база данных и authserver оформлены в docker-микросервис
+  - начиная с коммита 8e034cb - реализация на spring-security-jwt, с отделением authserver в отдельный проект (репозиторий [SSJWT](https://github.com/SuvorovJA/SSJWT)). Authserver теперь требует отдельного запуска как [docker-микросервис](https://github.com/SuvorovJA/SSJWT/blob/master/docker/start_app.sh).
 - PostgreSQL 10
   - оба проекта используют Postgresql. RRoC - использует database 'postgres'. SSJWT - использует database 'authserver'
 - Flyway
 - Mockito (транзитивно)
+
+##### запуск тестов
+
+- ru.sua.rroc.repository.CitizenRepositoryTest и ru.sua.rroc.service.CitizenServiceTest особой подготовки не требуют, используют docker-контейнер Postgresql10 и миграции из приложения. 
+
+- ru.sua.rroc.controller.CitizenControllerTest использует ту же инстанцию Postgresql10, что и два вышеупомянутых тест-класса. И требует: 
+  - предварительной сборки docker-образа [ssjwt:latest](https://github.com/SuvorovJA/SSJWT)/[docker/build_ssjwt_image.sh](https://github.com/SuvorovJA/SSJWT/blob/master/docker/build_ssjwt_image.sh). Authserver из ssjwt:latest при работе использует собственную инстанцию Postgresql10 недоступную снаружи compose-контейнера.
+  - поскольку публикации в docker-hub получившегося образа не предполагается, то для запуска используется [локальный docker-compose](https://www.testcontainers.org/modules/docker_compose/#using-local-compose-mode), соответственно docker-compose должен присутствовать в системе. _На windows работоспособность не проверялась и не гарантируется._
+
+  
