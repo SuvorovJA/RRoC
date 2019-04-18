@@ -40,6 +40,7 @@ public class CitizenControllerTest {
     private static final String ETHALON_ID_5_JSON = "{\"id\":5,\"fullName\":\"Mickey-Treutel\",\"dob\":\"1996-03-19\",\"address\":\"90 Bunker Hill Terrace\",\"dulnumber\":\"205343909704\"}";
     private static final String ETHALON_ID_5_MODIFIED_JSON = "{\"id\":5,\"fullName\":\"Mickey-Treutel\",\"dob\":\"1996-03-19\",\"address\":\"New address\",\"dulnumber\":\"205343909704\"}";
     private static final String ETHALON_NEW_JSON = "{\"fullName\":\"Mickey-Mouse\",\"dob\":\"1996-06-06\",\"address\":\"Disney\",\"dulnumber\":\"0000000001\"}";
+    private static final String ETHALON_NEW_CORRECT_HAVE_DUPLACARED_DUL_JSON = "{\"fullName\":\"John-Dow\",\"dob\":\"1996-06-06\",\"address\":\"Disney\",\"dulnumber\":\"205343909704\"}";
     private static final String ETHALON_NEW_INCORRECT_JSON = "{\"fullName\":\"Donald Duck\",\"dulnumber\":\"2\"}";
     private static final String OAUTH_CLIENT_CREDENTIALS = "Basic Y2xpZW50SWQ6c2VjcmV0";    // clientId:secret
 
@@ -52,6 +53,7 @@ public class CitizenControllerTest {
     private CitizenDTO ethalonId5;
     private Citizen ethalonId5ModifiedAsCitizenDomainClass;
     private Citizen ethalonNewAsCitizenDomainClass;
+    private Citizen ethalonNewCorrectHaveDuplicateDulnumberAsCitizenDomainClass;
     private CitizenDTO ethalonNewIncorrect;
     private String jwtToken;
 
@@ -69,6 +71,7 @@ public class CitizenControllerTest {
         ethalonId5 = mapper.readValue(ETHALON_ID_5_JSON, CitizenDTO.class);
         ethalonId5ModifiedAsCitizenDomainClass = mapper.readValue(ETHALON_ID_5_MODIFIED_JSON, Citizen.class);
         ethalonNewAsCitizenDomainClass = mapper.readValue(ETHALON_NEW_JSON, Citizen.class);
+        ethalonNewCorrectHaveDuplicateDulnumberAsCitizenDomainClass = mapper.readValue(ETHALON_NEW_CORRECT_HAVE_DUPLACARED_DUL_JSON, Citizen.class);
         ethalonNewIncorrect = mapper.readValue(ETHALON_NEW_INCORRECT_JSON, CitizenDTO.class);
 
         getAndInstallAuthTokenFromServer("faro", "faro-password");
@@ -134,6 +137,15 @@ public class CitizenControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(ethalonNewIncorrect))
                 .exchange().expectStatus().isBadRequest();
+    }
+
+    @Test
+    public void createCorrectButHaveDuplicateDulnumberCitizen() {
+        testClient.post().uri("/citizens")
+                .headers(h -> h.add("Authorization", jwtToken))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(ethalonNewCorrectHaveDuplicateDulnumberAsCitizenDomainClass))
+                .exchange().expectStatus().is5xxServerError();
     }
 
     @Test

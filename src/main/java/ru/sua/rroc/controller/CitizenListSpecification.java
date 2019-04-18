@@ -9,6 +9,10 @@ import ru.sua.rroc.domain.CitizenListRequest;
 
 import static org.springframework.data.jpa.domain.Specification.where;
 
+
+/**
+ * класс реализует условие фильтрации(для CriteriaQuery) исходя их трёх возможных параметров поиска
+ */
 @Component
 public class CitizenListSpecification extends BaseSpecification<Citizen, CitizenListRequest> {
 
